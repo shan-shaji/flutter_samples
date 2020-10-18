@@ -19,12 +19,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     HomepageViewModel homePageView = Provider.of<HomepageViewModel>(context);
-    _editingNameController = new TextEditingController(
-      text: homePageView.getUserName,
-    );
-    _editingEmailController = new TextEditingController(
-      text: homePageView.getUserEmail,
-    );
 
     return Scaffold(
       body: SafeArea(
@@ -115,7 +109,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 textAlign: TextAlign.center,
-                                onSubmitted: (newName) {
+                                onChanged: (newName) {
                                   homePageViewModel.setUserName(newName);
                                 },
                                 controller: _editingNameController,
@@ -163,7 +157,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 textAlign: TextAlign.center,
-                                onSubmitted: (newEmail) {
+                                onChanged: (newEmail) {
                                   homePageViewModel.setEmail(newEmail);
                                 },
                                 controller: _editingEmailController,
