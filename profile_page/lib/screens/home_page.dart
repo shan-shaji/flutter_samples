@@ -2,26 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:profile_page/constants/colors.dart';
 import 'package:profile_page/constants/styles.dart';
 import 'package:profile_page/provider/home_page_provider.dart';
+import 'package:profile_page/utils/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
 
 class HomePage extends StatelessWidget {
-  bool _isEditing = true;
-
   FocusNode focusNode1 = new FocusNode();
   FocusNode focusNode2 = new FocusNode();
   TextEditingController _editingNameController, _editingEmailController;
+
+  void dispose() {
+    _editingEmailController.dispose();
+    _editingEmailController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    HomepageViewModel homePageViewModel =
-        Provider.of<HomepageViewModel>(context);
+    HomepageViewModel homePageView = Provider.of<HomepageViewModel>(context);
     _editingNameController = new TextEditingController(
-      text: homePageViewModel.getUser.name,
+      text: homePageView.getUserName,
     );
     _editingEmailController = new TextEditingController(
-      text: homePageViewModel.getUser.email,
+      text: homePageView.getUserEmail,
     );
 
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -39,10 +43,41 @@ class HomePage extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    radius: 90.0,
-                    backgroundImage:
-                        AssetImage(homePageViewModel.getUser.profileImage),
+                  Container(
+                    child: Stack(
+                      children: [
+                        Consumer<HomepageViewModel>(
+                          builder: (builder, homePageViewModel, child) {
+                            return CircleAvatar(
+                              backgroundImage:
+                                  homePageViewModel.profileImage != null
+                                      ? FileImage(
+                                          File(homePageViewModel.profileImage),
+                                        )
+                                      : AssetImage("assets/profile.jpeg"),
+                              radius: 90.0,
+                            );
+                          },
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          child: homePageView.getEditStatus == true
+                              ? RawMaterialButton(
+                                  fillColor: Colors.white,
+                                  onPressed: () async {
+                                    File image = await GetImage().getImage();
+                                    homePageView.setProfile(image.path);
+                                  },
+                                  shape: CircleBorder(),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    color: profileContainerColor,
+                                  ),
+                                )
+                              : Container(),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 20.0,
@@ -72,9 +107,16 @@ class HomePage extends StatelessWidget {
                           ? Container(
                               width: 500,
                               child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: "Enter your name",
+                                  hintStyle: ktextStyle.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 10.0,
+                                  ),
+                                ),
                                 textAlign: TextAlign.center,
-                                onSubmitted: (name) {
-                                  homePageViewModel.setUserName(name);
+                                onSubmitted: (newName) {
+                                  homePageViewModel.setUserName(newName);
                                 },
                                 controller: _editingNameController,
                                 focusNode: focusNode1,
@@ -89,7 +131,7 @@ class HomePage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                   Text(
-                                    homePageViewModel.getUser.name,
+                                    homePageViewModel.getUserName,
                                     style: ktextStyle.copyWith(
                                       color: Colors.white,
                                       fontSize: 30.0,
@@ -113,15 +155,22 @@ class HomePage extends StatelessWidget {
                           ? Container(
                               width: 500,
                               child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: "Enter your email",
+                                  hintStyle: ktextStyle.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 10.0,
+                                  ),
+                                ),
                                 textAlign: TextAlign.center,
-                                onSubmitted: (email) {
-                                  homePageViewModel.setEmail(email);
+                                onSubmitted: (newEmail) {
+                                  homePageViewModel.setEmail(newEmail);
                                 },
                                 controller: _editingEmailController,
                                 focusNode: focusNode2,
                                 style: ktextStyle.copyWith(
                                   color: Colors.white,
-                                  fontSize: 30.0,
+                                  fontSize: 20.0,
                                 ),
                                 cursorColor: Colors.white,
                               ),
@@ -130,7 +179,7 @@ class HomePage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  homePageViewModel.getUser.email,
+                                  homePageViewModel.getUserEmail,
                                   style: ktextStyle.copyWith(
                                     color: Colors.white,
                                     fontSize: 20.0,
@@ -143,6 +192,26 @@ class HomePage extends StatelessWidget {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 20.0,
+              ),
+              homePageView.getEditStatus == true
+                  ? RawMaterialButton(
+                      onPressed: () {
+                        homePageView.setStatus(false);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.check,
+                          color: profileContainerColor,
+                          size: 50.0,
+                        ),
+                      ),
+                      fillColor: Colors.white,
+                      shape: CircleBorder(),
+                    )
+                  : Container()
             ],
           ),
         ),
