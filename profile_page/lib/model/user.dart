@@ -6,3 +6,5 @@ class User {
 
   User({this.name, this.email, this.profileImage});
 }
+
+
