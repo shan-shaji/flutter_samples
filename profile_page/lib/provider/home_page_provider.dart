@@ -19,6 +19,25 @@ class HomepageViewModel extends HomePageView with ChangeNotifier {
   String get getUserEmail => user.email;
   String get profileImage => user.profileImage;
 
+  void getInitialname() async {
+    super.user.name = await Prefs().readString("name") ?? "Enter your name";
+    print(super.user.name);
+    notifyListeners();
+  }
+
+  void getInitialEmail() async {
+    super.user.email = await Prefs().readString("email") ?? "Enter your email";
+    print(super.user.email);
+    notifyListeners();
+  }
+
+  void getInitialProfile() async {
+    super.user.profileImage =
+        await Prefs().readString("profile") ?? "assets/profile.jpeg";
+    print(super.user.profileImage);
+    notifyListeners();
+  }
+
   void setStatus(bool status) {
     super._isEditing = status;
     notifyListeners();
@@ -38,6 +57,7 @@ class HomepageViewModel extends HomePageView with ChangeNotifier {
 
   void setProfile(String profileUrl) {
     super.user.profileImage = profileUrl;
+    Prefs().storeString("profile", profileUrl);
     notifyListeners();
   }
 }
