@@ -6,3 +6,8 @@ final ktextStyle = TextStyle(
   color: profileContainerColor2,
   letterSpacing: 2,
 );
+final ksubtextStyle = TextStyle(
+  fontWeight: FontWeight.bold,
+  color: profileContainerColor2,
+  letterSpacing: 2,
+);
